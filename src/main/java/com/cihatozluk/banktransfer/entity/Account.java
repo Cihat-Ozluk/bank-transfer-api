@@ -33,7 +33,7 @@ public class Account {
     @Column(name = "created_at",updatable = false,nullable = false)
     private LocalDateTime createdAt;
 
-    public Account(){}
+    protected Account(){}
 
     public Account(String accountNumber, Currency currency, Customer customer) {
         this.accountNumber = accountNumber;
