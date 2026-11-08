@@ -1,5 +1,7 @@
 package com.cihatozluk.banktransfer.entity;
 
+import com.cihatozluk.banktransfer.exception.InsufficientBalanceException;
+import com.cihatozluk.banktransfer.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,25 +17,26 @@ public class Account {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="account_number",nullable = false,unique = true)
+    @Column(name = "account_number", nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(name="balance",nullable = false,precision = 19,scale = 2)
-    private BigDecimal balance=BigDecimal.ZERO;
+    @Column(name = "balance", nullable = false, precision = 19, scale = 2)
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "currency",nullable = false)
+    @Column(name = "currency", nullable = false)
     private Currency currency;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "customer_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @CreationTimestamp
-    @Column(name = "created_at",updatable = false,nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    protected Account(){}
+    protected Account() {
+    }
 
     public Account(String accountNumber, Currency currency, Customer customer) {
         this.accountNumber = accountNumber;
@@ -41,31 +44,31 @@ public class Account {
         this.customer = customer;
     }
 
-    public void deposit(BigDecimal amount){
+    public void deposit(BigDecimal amount) {
 
         validateAmount(amount);
-        balance=balance.add(amount);
+        balance = balance.add(amount);
     }
 
-    public void withdraw(BigDecimal amount){
+    public void withdraw(BigDecimal amount) {
 
         validateAmount(amount);
 
-        if(amount.compareTo(balance)>0){
-            throw new IllegalArgumentException("INSUFFICIENT_BALANCE");
+        if (amount.compareTo(balance) > 0) {
+            throw new InsufficientBalanceException();
         }
 
-        balance=balance.subtract(amount);
+        balance = balance.subtract(amount);
     }
 
-    private void validateAmount(BigDecimal amount){
+    private void validateAmount(BigDecimal amount) {
 
-        if(amount==null){
-            throw new IllegalArgumentException("AMOUNT_REQUIRED");
+        if (amount == null) {
+            throw new InvalidAmountException("Amount is required");
         }
 
-        if(amount.compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("INVALID_AMOUNT");
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("Amount must be positive");
         }
     }
 
