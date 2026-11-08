@@ -1,5 +1,6 @@
 package com.cihatozluk.banktransfer.entity;
 
+import com.cihatozluk.banktransfer.exception.SameAccountTransferException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -61,7 +62,7 @@ public class Transaction {
         Objects.requireNonNull(to, "to account is required");
 
         if (from.getId().equals(to.getId())) {
-            throw new IllegalArgumentException("SAME_ACCOUNT");
+            throw new SameAccountTransferException();
         }
 
         return new Transaction(TransactionType.TRANSFER, amount, from, to);

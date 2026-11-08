@@ -72,4 +72,16 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleMessageNotReadable(HttpMessageNotReadableException exc) {
         return ErrorResponse.of("MALFORMED_REQUEST", "Request body is missing or malformed");
     }
+
+    @ExceptionHandler(SameAccountTransferException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleSameAccountTransfer(SameAccountTransferException exc) {
+        return ErrorResponse.of("SAME_ACCOUNT_TRANSFER", exc.getMessage());
+    }
+
+    @ExceptionHandler(CurrencyMismatchException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+    public ErrorResponse handleCurrencyMismatch(CurrencyMismatchException exc) {
+        return ErrorResponse.of("CURRENCY_MISMATCH", exc.getMessage());
+    }
 }
